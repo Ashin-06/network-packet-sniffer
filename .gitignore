@@ -1,0 +1,9 @@
+# Python specific files
+__pycache__/
+*.pyc
+venv/
+.env
+
+# IDE and editor folders
+.vscode/
+.idea

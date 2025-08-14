@@ -19,7 +19,7 @@ A command-line network packet sniffing tool written in Python using the Scapy li
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/Ashin-06/network-packet-sniffer.git](https://github.com/Ashin-06/network-packet-sniffer.git)
+    git clone https://github.com/Ashin-06/network-packet-sniffer.git
     cd network-packet-sniffer
     ```
 

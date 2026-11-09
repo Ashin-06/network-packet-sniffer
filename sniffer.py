@@ -68,13 +68,19 @@ def _print_summary(tally: Counter) -> None:
 
 
 def _build_examples() -> list:
-    """A few packets made in memory, so the parser can be exercised without capturing."""
+    """A few packets made in memory, so the parser can be exercised without capturing.
+
+    The Ethernet addresses are set explicitly: without them, measuring a packet's length
+    makes Scapy resolve a destination MAC from the OS routing table, which isn't available
+    on a machine with no configured interface.
+    """
+    eth = lambda: Ether(src="02:00:00:00:00:01", dst="02:00:00:00:00:02")  # noqa: E731
     return [
-        Ether() / IP(src="10.0.0.1", dst="10.0.0.2") / TCP(sport=51000, dport=443),
-        Ether() / IP(src="10.0.0.2", dst="8.8.8.8") / UDP(sport=52000, dport=53),
-        Ether() / IP(src="10.0.0.1", dst="10.0.0.2") / ICMP(),
-        Ether() / IPv6(src="::1", dst="::2") / TCP(sport=4000, dport=80),
-        Ether() / b"not an IP packet",
+        eth() / IP(src="10.0.0.1", dst="10.0.0.2") / TCP(sport=51000, dport=443),
+        eth() / IP(src="10.0.0.2", dst="8.8.8.8") / UDP(sport=52000, dport=53),
+        eth() / IP(src="10.0.0.1", dst="10.0.0.2") / ICMP(),
+        eth() / IPv6(src="::1", dst="::2") / TCP(sport=4000, dport=80),
+        eth() / b"not an IP packet",
     ]
 
 

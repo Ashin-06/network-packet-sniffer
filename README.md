@@ -1,46 +1,66 @@
 # Network Packet Sniffer
 
-A command-line network packet sniffing tool written in Python using the Scapy library. This script captures live network traffic on a specified interface and displays key information about each packet, such as IP addresses, ports, and payload data.
+A command-line network traffic sniffer written in Python with [Scapy](https://scapy.net/).
+It captures live packets on an interface and prints a readable one-line summary of each
+— time, protocol, source and destination (with ports for TCP/UDP), and size — then a
+protocol breakdown when it stops. It is read-only: it observes traffic and never sends
+anything.
+
+A learning project for understanding how packets look on the wire, in the spirit of
+`tcpdump` and Wireshark.
 
 ## Features
 
-* Captures live network packets on a given interface.
-* Parses IP layer information to show source and destination IPs.
-* Identifies TCP/UDP protocols and displays source/destination ports.
-* Prints the raw data payload of packets, if present.
-* Uses `argparse` to easily accept a network interface from the command line.
+- Live capture on a chosen interface, with an optional BPF filter (e.g. `tcp port 443`).
+- Readable per-packet lines for IPv4, IPv6, TCP, UDP and ICMP; other packets fall back to Scapy's summary.
+- A protocol tally at the end, with percentages.
+- Optional save to a `.pcap` file to open later in Wireshark.
+- A `--selftest` that parses built-in packets, so you can check the code without capturing.
 
-## Technologies Used
+## Setup
 
-* Python
-* Scapy
+```bash
+git clone https://github.com/Ashin-06/network-packet-sniffer.git
+cd network-packet-sniffer
+pip install -r requirements.txt
+```
 
-## Setup and Usage
+## Usage
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/Ashin-06/network-packet-sniffer.git
-    cd network-packet-sniffer
-    ```
+Capturing live traffic needs privileges: run with `sudo` on Linux/macOS, or in an
+Administrator terminal on Windows (with [Npcap](https://npcap.com/) installed).
 
-2.  **Install Dependencies:**
-    This project requires the Scapy library.
-    ```bash
-    pip install scapy
-    ```
+```bash
+sudo python sniffer.py --interface eth0 --count 20
+sudo python sniffer.py --filter "tcp port 443" --output capture.pcap
+python sniffer.py --selftest        # no privileges needed
+```
 
-3.  **Find Your Network Interface:**
-    You will need to know the name of the network interface you want to monitor (e.g., `eth0`, `en0`, `Wi-Fi`).
-    * On Windows: `ipconfig`
-    * On macOS/Linux: `ifconfig` or `ip a`
+| Option | Meaning |
+|---|---|
+| `-i`, `--interface` | interface to capture on, e.g. `eth0`, `Wi-Fi` |
+| `-f`, `--filter` | BPF filter, e.g. `"udp port 53"` |
+| `-c`, `--count` | number of packets to capture (`0` = until Ctrl+C) |
+| `-t`, `--timeout` | stop after this many seconds |
+| `-o`, `--output` | also write captured packets to a `.pcap` file |
 
-4.  **Run the Script:**
-    Running a network sniffer requires administrator/root privileges.
-    ```bash
-    # Replace <interface_name> with your actual network interface
-    sudo python packet_sniffer.py --interface <interface_name>
-    ```
+To find an interface name: `ipconfig` on Windows, `ip a` or `ifconfig` on Linux/macOS.
 
-## ⚖️ Disclaimer
+## Tests
 
-This tool is for educational purposes only. Only use it on networks that you own or have explicit permission to monitor. Unauthorized packet sniffing is illegal.
+```bash
+pip install pytest
+python -m pytest -q
+```
+
+The tests build packets in memory, so they need no network interface and no privileges.
+
+## Note on use
+
+Only capture traffic on networks you own or are authorized to monitor. Intercepting
+other people's traffic without permission is illegal in most places. This project is
+for learning on your own machine or lab network.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
